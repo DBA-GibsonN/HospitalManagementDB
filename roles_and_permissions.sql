@@ -30,4 +30,10 @@ GRANT SELECT ON Prescriptions TO patient_user;
 -- (Optional) prevent patient_user from seeing all rows later via RLS
 
 
+-- Read-only user (e.g. Analyst)
+CREATE ROLE analyst WITH LOGIN PASSWORD 'AnalystPass123';
+GRANT CONNECT ON DATABASE hospital_db TO analyst;
+GRANT USAGE ON SCHEMA public TO analyst;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO analyst;
+
 
