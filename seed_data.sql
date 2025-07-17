@@ -1,5 +1,6 @@
 -- ===============================
 -- Sample Data for Hospital DB
+-- Author: Gibson (DBA-GibsonN)
 -- ===============================
 
 -- Departments
@@ -7,17 +8,17 @@ INSERT INTO Departments (DepartmentName) VALUES
 ('Cardiology'), ('Pediatrics'), ('Neurology'), ('Oncology');
 
 -- Doctors
-INSERT INTO Doctors (FullName, Specialty, DepartmentID) VALUES
-('Dr. Linda Carter', 'Cardiologist', 1),
-('Dr. John Smith', 'Pediatrician', 2),
-('Dr. Emily Stone', 'Neurologist', 3),
-('Dr. Omar Malik', 'Oncologist', 4);
+INSERT INTO Doctors (FirstName, LastName, Specialty, DepartmentID) VALUES
+('Linda', 'Carter', 'Cardiologist', 1),
+('John', 'Smith', 'Pediatrician', 2),
+('Emily', 'Stone', 'Neurologist', 3),
+('Omar', 'Malik', 'Oncologist', 4);
 
 -- Patients
-INSERT INTO Patients (FullName, DOB, Gender, ContactInfo) VALUES
-('Alice Johnson', '1990-04-12', 'Female', 'alice.johnson@example.com'),
-('Michael Brown', '1985-11-23', 'Male', 'michael.brown@example.com'),
-('Sofia Ramirez', '2002-07-05', 'Female', 'sofia.ramirez@example.com');
+INSERT INTO Patients (FirstName, LastName, DOB, Gender, ContactInfo) VALUES
+('Alice', 'Johnson', '1990-04-12', 'Female', 'alice.johnson@example.com'),
+('Michael', 'Brown', '1985-11-23', 'Male', 'michael.brown@example.com'),
+('Sofia', 'Ramirez', '2002-07-05', 'Female', 'sofia.ramirez@example.com');
 
 -- Medications
 INSERT INTO Medications (MedicationName, Dosage) VALUES

@@ -1,4 +1,7 @@
--- Get a patient's appointment history
+-- ============================================
+-- Function: GetPatientAppointments
+-- ============================================
+
 CREATE OR REPLACE FUNCTION GetPatientAppointments(pid INT)
 RETURNS TABLE (
     AppointmentID INT,
@@ -12,17 +15,15 @@ BEGIN
         a.AppointmentID,
         a.AppointmentDate,
         a.Status,
-        d.FullName AS DoctorName
+        CONCAT(d.firstname, ' ', d.lastname)::VARCHAR AS DoctorName
     FROM Appointments a
     JOIN Doctors d ON a.DoctorID = d.DoctorID
     WHERE a.PatientID = pid;
 END;
 $$ LANGUAGE plpgsql;
 
-
 -- ============================================
 -- Function: GetPatientPrescriptions
--- Description: Returns a patient's prescription history
 -- ============================================
 
 CREATE OR REPLACE FUNCTION GetPatientPrescriptions(pid INT)
@@ -38,7 +39,7 @@ BEGIN
         m.MedicationName,
         pr.DosageInstructions,
         pr.DatePrescribed,
-        d.FullName AS DoctorName
+        CONCAT(d.firstname, ' ', d.lastname)::VARCHAR AS DoctorName
     FROM Prescriptions pr
     JOIN Medications m ON pr.MedicationID = m.MedicationID
     JOIN Doctors d ON pr.DoctorID = d.DoctorID

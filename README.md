@@ -1,39 +1,114 @@
-# HospitalManagementDB
-SQL-based Hospital Management System with ERD, procedures, sample data and queries
 
-## 🔐 Backup & Restore (Disaster Recovery)
+# 🏥 Hospital Management Database (PostgreSQL)
 
-This project includes real PostgreSQL backup and restore operations using `pg_dump` and `pg_restore`.
+A realistic PostgreSQL-based hospital database designed and developed by **Gibson (DBA-GibsonN)** to showcase hands-on database administration and development skills. This project simulates the key operations of a hospital including patient records, appointments, prescriptions, and reporting with auditing and stored procedures.
 
-### 💾 Backup File Example
+---
 
-![Backup Screenshot](screenshots/backup_file.png)
+## 📦 Features
 
-### 🛠️ Backup Commands
+- ✅ Normalized schema with 6+ interconnected tables
+- ✅ Sample data for patients, doctors, appointments, medications
+- ✅ Stored functions for retrieving patient history
+- ✅ Reporting queries for business intelligence
+- ✅ Audit logging using triggers on patient updates
+- ✅ Role and permission setup
+- ✅ Backup and restore with `pg_dump`
+- ✅ Version-controlled with Git & SQL scripts
+
+---
+
+## 🛠 Tech Stack
+
+- **Database:** PostgreSQL 15+
+- **Editor:** VS Code
+- **Tools:** Git, Bash, pgAdmin (optional)
+- **Language:** SQL, PL/pgSQL
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the Repository
 
 ```bash
-pg_dump -U postgres -d hospital_db -F c -f hospital_db.backup
-pg_restore -U postgres -d hospital_db hospital_db.backup
+git clone https://github.com/DBA-GibsonN/hospital-db.git
+cd hospital-db
+```
 
+### 2. Create and Connect to the Database
 
-## 🔍 Change Audit Logging
+```bash
+createdb hospital_db
+psql -d hospital_db
+```
 
-All changes to the `patients` table are automatically logged via a PostgreSQL `AFTER` trigger.
-
-### 💡 Features:
-- Tracks `INSERT`, `UPDATE`, and `DELETE` operations
-- Stores full `old_data` and `new_data` in JSON format
-- Records the `user` who made the change
-
-### 📸 Audit Log Example
-
-![Audit Log Screenshot](screenshots/audit_log_demo.png)
-
-### 🔧 Sample Trigger Logic (PL/pgSQL)
+### 3. Run the SQL Scripts in Order
 
 ```sql
-IF TG_OP = 'UPDATE' THEN
-  INSERT INTO patient_audit_log(
-    operation_type, patient_id, changed_by, old_data, new_data
-  )
-  VALUES ('UPDATE', NEW.patientid, current_user, to_jsonb(OLD), to_jsonb(NEW));
+-- 1. Schema
+\i schema.sql
+
+-- 2. Seed Data
+\i seed_data.sql
+
+-- 3. Roles & Permissions
+\i role_and_permissions.sql
+
+-- 4. Functions
+\i functions.sql
+
+-- 5. Reporting Queries
+\i reporting_queries.sql
+
+-- 6. Triggers
+\i audit_trigger.sql
+```
+
+---
+
+## 📂 File Structure
+
+| File | Description |
+|------|-------------|
+| `schema.sql` | Creates all database tables |
+| `seed_data.sql` | Inserts sample data |
+| `role_and_permissions.sql` | Adds users and roles |
+| `functions.sql` | Functions like `GetPatientAppointments()` |
+| `reporting_queries.sql` | Useful queries for insights |
+| `audit_trigger.sql` | Adds audit logging to patients table |
+
+---
+
+## 🔍 Sample Queries
+
+```sql
+-- View patient prescription history
+SELECT * FROM GetPatientPrescriptions(1);
+
+-- See upcoming appointments
+SELECT * FROM GetPatientAppointments(1);
+
+-- Audit log (after updating a patient)
+SELECT * FROM patient_audit_log ORDER BY changed_at DESC;
+```
+
+---
+
+## 📸 Screenshots
+
+_Add screenshots from pgAdmin or VS Code here showing successful query results and table views._
+
+---
+
+## 👨‍💻 Author
+
+**Gibson N. (DBA-GibsonN)**  
+📧 [nwagboniwe.gibson@yahoo.com]  
+🔗 https://github.com/DBA-GibsonN
+
+---
+
+## 📝 License
+
+MIT License (or specify if different)
