@@ -66,25 +66,30 @@ def add_patient():
 # ✅ GET: All patients
 @app.route('/patients', methods=['GET'])
 def get_patients():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('SELECT * FROM Patients ORDER BY PatientID;')
-    rows = cur.fetchall()
-    cur.close()
-    conn.close()
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('SELECT * FROM Patients ORDER BY PatientID;')
+        rows = cur.fetchall()
+        cur.close()
+        conn.close()
 
-    patients = []
-    for row in rows:
-        patients.append({
-            "PatientID": row[0],
-            "FirstName": row[1],
-            "LastName": row[2],
-            "DOB": str(row[3]) if row[3] else None,
-            "Gender": row[4],
-            "ContactInfo": row[5]
-        })
+        patients = []
+        for row in rows:
+            patients.append({
+                "PatientID": row[0],
+                "FirstName": row[1],
+                "LastName": row[2],
+                "DOB": str(row[3]) if row[3] else None,
+                "Gender": row[4],
+                "ContactInfo": row[5]
+            })
 
-    return jsonify(patients)
+        return jsonify(patients)
+    except Exception as e:
+        print(f"❌ ERROR in GET /patients: {e}")
+        return jsonify({'error': str(e)}), 500
+
 
 
 # ✅ GET: Patient by ID
