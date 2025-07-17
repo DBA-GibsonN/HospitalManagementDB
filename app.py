@@ -1,29 +1,13 @@
+# app.py
 from flask import Flask, request, jsonify
-import psycopg2
 import os
 from dotenv import load_dotenv
+from db import get_db_connection  # ✅ Use the centralized db function
 
-# Load environment variables from .env file
+# ✅ Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
-
-# Database config from .env
-DB_NAME = os.getenv("DB_NAME")
-DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
-DB_HOST = os.getenv("DB_HOST")
-DB_PORT = os.getenv("DB_PORT")
-
-# Function to connect to the database
-def get_db_connection():
-    return psycopg2.connect(
-        dbname=DB_NAME,
-        user=DB_USER,
-        password=DB_PASSWORD,
-        host=DB_HOST,
-        port=DB_PORT
-    )
 
 # ✅ Home route
 @app.route('/')
@@ -91,70 +75,82 @@ def get_patients():
         return jsonify({'error': str(e)}), 500
 
 
-
 # ✅ GET: Patient by ID
 @app.route('/patients/<int:id>', methods=['GET'])
 def get_patient(id):
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('SELECT * FROM Patients WHERE PatientID = %s;', (id,))
-    row = cur.fetchone()
-    cur.close()
-    conn.close()
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('SELECT * FROM Patients WHERE PatientID = %s;', (id,))
+        row = cur.fetchone()
+        cur.close()
+        conn.close()
 
-    if row:
-        patient = {
-            "PatientID": row[0],
-            "FirstName": row[1],
-            "LastName": row[2],
-            "DOB": str(row[3]) if row[3] else None,
-            "Gender": row[4],
-            "ContactInfo": row[5]
-        }
-        return jsonify(patient)
-    else:
-        return jsonify({"error": "Patient not found"}), 404
+        if row:
+            patient = {
+                "PatientID": row[0],
+                "FirstName": row[1],
+                "LastName": row[2],
+                "DOB": str(row[3]) if row[3] else None,
+                "Gender": row[4],
+                "ContactInfo": row[5]
+            }
+            return jsonify(patient)
+        else:
+            return jsonify({"error": "Patient not found"}), 404
+
+    except Exception as e:
+        print(f"❌ ERROR in GET /patients/<id>: {e}")
+        return jsonify({'error': str(e)}), 500
 
 
 # ✅ PUT: Update a patient
 @app.route('/patients/<int:id>', methods=['PUT'])
 def update_patient(id):
-    data = request.get_json()
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute(
-        '''UPDATE Patients
-           SET FirstName = %s, LastName = %s, DOB = %s, Gender = %s, ContactInfo = %s
-           WHERE PatientID = %s;''',
-        (
-            data.get('first_name'),
-            data.get('last_name'),
-            data.get('dob'),
-            data.get('gender'),
-            data.get('contact_info'),
-            id
+    try:
+        data = request.get_json()
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(
+            '''UPDATE Patients
+               SET FirstName = %s, LastName = %s, DOB = %s, Gender = %s, ContactInfo = %s
+               WHERE PatientID = %s;''',
+            (
+                data.get('first_name'),
+                data.get('last_name'),
+                data.get('dob'),
+                data.get('gender'),
+                data.get('contact_info'),
+                id
+            )
         )
-    )
-    conn.commit()
-    cur.close()
-    conn.close()
+        conn.commit()
+        cur.close()
+        conn.close()
+        return jsonify({"message": "Patient updated"})
 
-    return jsonify({"message": "Patient updated"})
+    except Exception as e:
+        print(f"❌ ERROR in PUT /patients/<id>: {e}")
+        return jsonify({'error': str(e)}), 500
 
 
 # ✅ DELETE: Delete a patient
 @app.route('/patients/<int:id>', methods=['DELETE'])
 def delete_patient(id):
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('DELETE FROM Patients WHERE PatientID = %s;', (id,))
-    conn.commit()
-    cur.close()
-    conn.close()
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('DELETE FROM Patients WHERE PatientID = %s;', (id,))
+        conn.commit()
+        cur.close()
+        conn.close()
+        return jsonify({"message": "Patient deleted"})
 
-    return jsonify({"message": "Patient deleted"})
+    except Exception as e:
+        print(f"❌ ERROR in DELETE /patients/<id>: {e}")
+        return jsonify({'error': str(e)}), 500
 
 
-# ✅ Run locally if needed
+# ✅ Run locally
 if __name__ == '__main__':
     app.run(debug=True)
